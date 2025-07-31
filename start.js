@@ -39,13 +39,21 @@ if (missingEnvVars.length > 0) {
         console.warn(`   - ${envVar}`);
     });
     console.warn('');
-    console.warn('📝 Please set these environment variables or create a .env file');
-    console.warn('   See env.example for reference');
+    console.warn('📝 Please set these environment variables in your deployment platform');
+    console.warn('   See DEPLOYMENT.md for platform-specific instructions');
+    
+    // Set NODE_ENV to production if PORT is set (indicates cloud deployment)
+    if (process.env.PORT && !process.env.NODE_ENV) {
+        process.env.NODE_ENV = 'production';
+    }
     
     // Don't exit in production, just warn
     if (process.env.NODE_ENV !== 'production') {
         console.warn('');
         console.warn('⚠️  Continuing anyway (development mode)');
+    } else {
+        console.warn('');
+        console.warn('⚠️  Continuing in production mode - some features may be disabled');
     }
 }
 

@@ -3,7 +3,14 @@ const { getUpcomingBookings, markReminderSent } = require('../database');
 
 class EmailService {
     constructor() {
-        this.transporter = nodemailer.createTransporter({
+        // Check if email configuration is available
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+            console.warn('⚠️  Email configuration missing. Email notifications will be disabled.');
+            this.transporter = null;
+            return;
+        }
+
+        this.transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
                 user: process.env.EMAIL_USER,
@@ -13,6 +20,11 @@ class EmailService {
     }
 
     async sendBookingConfirmation(bookingData) {
+        if (!this.transporter) {
+            console.warn('⚠️  Email transporter not configured. Skipping confirmation email.');
+            return { messageId: 'skipped-no-config' };
+        }
+
         try {
             const { name, email, date, time, meet_link } = bookingData;
             
@@ -33,6 +45,11 @@ class EmailService {
     }
 
     async sendReminder(bookingData) {
+        if (!this.transporter) {
+            console.warn('⚠️  Email transporter not configured. Skipping reminder email.');
+            return { messageId: 'skipped-no-config' };
+        }
+
         try {
             const { name, email, date, time, meet_link } = bookingData;
             
@@ -175,6 +192,12 @@ async function sendEmailReminders() {
             console.log(`Found ${upcomingBookings.length} upcoming bookings for reminders`);
             
             const emailService = new EmailService();
+            
+            // Skip if email is not configured
+            if (!emailService.transporter) {
+                console.log('Email not configured, skipping reminders');
+                return;
+            }
             
             for (const booking of upcomingBookings) {
                 try {

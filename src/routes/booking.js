@@ -74,7 +74,10 @@ router.post('/book', async (req, res) => {
 
         // Send confirmation email
         try {
-            await emailService.sendBookingConfirmation(bookingData);
+            const emailResult = await emailService.sendBookingConfirmation(bookingData);
+            if (emailResult.messageId === 'skipped-no-config') {
+                console.log('Email notification skipped - no email configuration');
+            }
         } catch (emailError) {
             console.error('Failed to send confirmation email:', emailError);
             // Don't fail the booking if email fails
