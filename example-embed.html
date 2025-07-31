@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Example: Embedded Consultation Booking Widget</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 500px;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .info {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .info h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info li:before {
+            content: "✅ ";
+            color: #4285f4;
+            font-weight: bold;
+        }
+
+        .widget-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .code-examples {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .code-examples h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>🚀 Free Consultation Booking</h1>
+        <p>Professional consultation booking system with Google Meet integration</p>
+    </div>
+
+    <div class="content">
+        <div class="info">
+            <h2>Why Choose Our Booking System?</h2>
+            <ul>
+                <li>Automatic Google Meet link generation</li>
+                <li>Email confirmations and reminders</li>
+                <li>Easy to embed on any website</li>
+                <li>Multi-language support (EN/FR)</li>
+                <li>Mobile-responsive design</li>
+                <li>100% free to use</li>
+                <li>No monthly fees or subscriptions</li>
+                <li>Professional email templates</li>
+                <li>Admin dashboard included</li>
+                <li>SQLite database storage</li>
+            </ul>
+
+            <h2>Perfect For:</h2>
+            <ul>
+                <li>Consultants and coaches</li>
+                <li>Service providers</li>
+                <li>Small businesses</li>
+                <li>Freelancers</li>
+                <li>Educational institutions</li>
+                <li>Healthcare providers</li>
+                <li>Legal professionals</li>
+                <li>Financial advisors</li>
+            </ul>
+        </div>
+
+        <div class="widget-container">
+            <!-- This is where the booking widget will appear -->
+            <div id="consultation-booking-widget"></div>
+        </div>
+    </div>
+
+    <div class="code-examples">
+        <h3>📋 How to Embed This Widget</h3>
+        
+        <h4>Method 1: Simple JavaScript Embed (Recommended)</h4>
+        <div class="code-block">
+&lt;div id="consultation-booking-widget"&gt;&lt;/div&gt;
+&lt;script src="http://localhost:3000/embed.js"&gt;&lt;/script&gt;
+        </div>
+
+        <h4>Method 2: Custom Configuration</h4>
+        <div class="code-block">
+&lt;script&gt;
+window.ConsultationBookingConfig = {
+    containerId: 'my-booking-widget',
+    serverUrl: 'http://localhost:3000',
+    language: 'fr', // 'en' or 'fr'
+    width: '100%',
+    height: '650px'
+};
+&lt;/script&gt;
+&lt;div id="my-booking-widget"&gt;&lt;/div&gt;
+&lt;script src="http://localhost:3000/embed.js"&gt;&lt;/script&gt;
+        </div>
+
+        <h4>Method 3: Simple Iframe</h4>
+        <div class="code-block">
+&lt;iframe 
+    src="http://localhost:3000/embed" 
+    width="500" 
+    height="600" 
+    frameborder="0"
+    style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"&gt;
+&lt;/iframe&gt;
+        </div>
+
+        <h4>Method 4: Listen for Booking Events</h4>
+        <div class="code-block">
+&lt;script&gt;
+window.addEventListener('consultationBooked', function(event) {
+    console.log('New booking:', event.detail);
+    // Send to analytics, show thank you message, etc.
+    gtag('event', 'consultation_booked', {
+        'customer_email': event.detail.email
+    });
+});
+&lt;/script&gt;
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🔗 <strong>Admin Panel:</strong> <a href="http://localhost:3000/admin">http://localhost:3000/admin</a></p>
+        <p>📖 <strong>Setup Guide:</strong> See SETUP.md for detailed installation instructions</p>
+        <p>💻 <strong>Source Code:</strong> Open source and free to use</p>
+    </div>
+
+    <!-- Load the booking widget -->
+    <script>
+        // Configure the widget
+        window.ConsultationBookingConfig = {
+            containerId: 'consultation-booking-widget',
+            serverUrl: 'http://localhost:3000',
+            language: 'en',
+            width: '100%',
+            height: '600px'
+        };
+
+        // Listen for successful bookings
+        window.addEventListener('consultationBooked', function(event) {
+            console.log('Consultation booked successfully:', event.detail);
+            
+            // You could add analytics tracking here
+            // gtag('event', 'consultation_booked');
+            
+            // Or show a custom thank you message
+            // alert('Thank you for booking! Check your email for details.');
+        });
+    </script>
+    <script src="http://localhost:3000/embed.js"></script>
+</body>
+</html>

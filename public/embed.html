@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultation Booking Widget</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            padding: 15px;
+        }
+
+        .widget-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #e1e5e9;
+        }
+
+        .widget-header {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .widget-header h2 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .widget-header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .widget-form {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4285f4;
+        }
+
+        .datetime-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 15px;
+            display: none;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4285f4;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .meet-link {
+            background: #e8f5e8;
+            border: 2px solid #4285f4;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .meet-link a {
+            color: #4285f4;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .auth-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .auth-notice a {
+            color: #4285f4;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .language-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .language-toggle select {
+            border: none;
+            background: transparent;
+            font-size: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .widget-container {
+                margin: 5px;
+                border-radius: 8px;
+            }
+            
+            .widget-form {
+                padding: 20px;
+            }
+            
+            .datetime-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-container">
+        <div class="language-toggle">
+            <select id="languageSelect" onchange="changeLanguage()">
+                <option value="en">EN</option>
+                <option value="fr">FR</option>
+            </select>
+        </div>
+
+        <div class="widget-header">
+            <h2 id="headerTitle">Free Consultation</h2>
+            <p id="headerSubtitle">Book your 60-minute session</p>
+        </div>
+
+        <div class="widget-form">
+            <div id="authNotice" class="auth-notice" style="display: none;">
+                <p id="authNoticeText">Authentication required. <a href="/auth/google" target="_parent">Click here</a></p>
+            </div>
+
+            <div id="successMessage" class="message success" style="display: none;">
+                <strong id="successTitle">Booked! ✅</strong>
+                <p id="successText">Check your email for the Meet link.</p>
+                <div id="meetLinkContainer" class="meet-link" style="display: none;">
+                    <a id="meetLinkUrl" href="#" target="_blank">Join Google Meet</a>
+                </div>
+            </div>
+
+            <div id="errorMessage" class="message error" style="display: none;">
+                <strong id="errorTitle">Error ❌</strong>
+                <p id="errorText">Please try again.</p>
+            </div>
+
+            <div id="loadingMessage" class="loading">
+                <div class="spinner"></div>
+                <p id="loadingText">Creating booking...</p>
+            </div>
+
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="name" id="nameLabel">Name *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" id="emailLabel">Email *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="datetime-row">
+                    <div class="form-group">
+                        <label for="date" id="dateLabel">Date *</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="time" id="timeLabel">Time *</label>
+                        <select id="time" name="time" required>
+                            <option value="" id="selectTimeOption">Select</option>
+                            <option value="09:00">09:00</option>
+                            <option value="10:00">10:00</option>
+                            <option value="11:00">11:00</option>
+                            <option value="12:00">12:00</option>
+                            <option value="13:00">13:00</option>
+                            <option value="14:00">14:00</option>
+                            <option value="15:00">15:00</option>
+                            <option value="16:00">16:00</option>
+                            <option value="17:00">17:00</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span id="submitBtnText">Book Now</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Language translations (compact for embed)
+        const translations = {
+            en: {
+                headerTitle: "Free Consultation",
+                headerSubtitle: "Book your 60-minute session",
+                authNoticeText: "Authentication required. <a href='/auth/google' target='_parent'>Click here</a>",
+                successTitle: "Booked! ✅",
+                successText: "Check your email for the Meet link.",
+                errorTitle: "Error ❌",
+                errorText: "Please try again.",
+                loadingText: "Creating booking...",
+                nameLabel: "Name *",
+                emailLabel: "Email *",
+                dateLabel: "Date *",
+                timeLabel: "Time *",
+                selectTimeOption: "Select",
+                submitBtnText: "Book Now"
+            },
+            fr: {
+                headerTitle: "Consultation Gratuite",
+                headerSubtitle: "Réservez votre session de 60 min",
+                authNoticeText: "Authentification requise. <a href='/auth/google' target='_parent'>Cliquez ici</a>",
+                successTitle: "Réservé! ✅",
+                successText: "Vérifiez votre email pour le lien Meet.",
+                errorTitle: "Erreur ❌",
+                errorText: "Veuillez réessayer.",
+                loadingText: "Création de la réservation...",
+                nameLabel: "Nom *",
+                emailLabel: "Email *",
+                dateLabel: "Date *",
+                timeLabel: "Heure *",
+                selectTimeOption: "Sélect.",
+                submitBtnText: "Réserver"
+            }
+        };
+
+        let currentLanguage = 'en';
+
+        function changeLanguage() {
+            const select = document.getElementById('languageSelect');
+            currentLanguage = select.value;
+            updateTexts();
+        }
+
+        function updateTexts() {
+            const texts = translations[currentLanguage];
+            
+            Object.keys(texts).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (key === 'authNoticeText') {
+                        element.innerHTML = texts[key];
+                    } else {
+                        element.textContent = texts[key];
+                    }
+                }
+            });
+        }
+
+        // Initialize widget
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('date');
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.min = today;
+
+            checkAuthStatus();
+            updateTexts();
+        });
+
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/auth/status');
+                const data = await response.json();
+                
+                if (!data.authenticated) {
+                    showAuthNotice();
+                } else {
+                    hideAuthNotice();
+                }
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+                showAuthNotice();
+            }
+        }
+
+        function showAuthNotice() {
+            document.getElementById('authNotice').style.display = 'block';
+            document.getElementById('bookingForm').style.display = 'none';
+        }
+
+        function hideAuthNotice() {
+            document.getElementById('authNotice').style.display = 'none';
+            document.getElementById('bookingForm').style.display = 'block';
+        }
+
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const bookingData = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                date: formData.get('date'),
+                time: formData.get('time')
+            };
+
+            showLoading();
+            hideMessages();
+
+            try {
+                const response = await fetch('/api/book', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(bookingData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showSuccess(result.booking.meet_link);
+                    e.target.reset();
+                } else {
+                    showError(result.error || 'Booking failed');
+                }
+            } catch (error) {
+                console.error('Booking error:', error);
+                showError('Network error. Please try again.');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        function showLoading() {
+            document.getElementById('loadingMessage').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function showSuccess(meetLink) {
+            const successDiv = document.getElementById('successMessage');
+            const meetLinkContainer = document.getElementById('meetLinkContainer');
+            const meetLinkUrl = document.getElementById('meetLinkUrl');
+            
+            successDiv.style.display = 'block';
+            
+            if (meetLink) {
+                meetLinkContainer.style.display = 'block';
+                meetLinkUrl.href = meetLink;
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            
+            errorText.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideMessages() {
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
