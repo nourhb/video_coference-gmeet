@@ -22,39 +22,27 @@ console.log(`✅ Node.js version: ${nodeVersion}`);
 // Load environment variables
 require('dotenv').config();
 
-// Validate required environment variables
-const requiredEnvVars = [
-    'GOOGLE_CLIENT_ID',
-    'GOOGLE_CLIENT_SECRET',
-    'GOOGLE_REDIRECT_URI',
+// Check optional environment variables (only for enhanced features)
+const optionalEnvVars = [
     'EMAIL_USER',
     'EMAIL_PASS'
 ];
 
-const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+const missingOptionalVars = optionalEnvVars.filter(envVar => !process.env[envVar]);
 
-if (missingEnvVars.length > 0) {
-    console.warn('⚠️  Missing environment variables:');
-    missingEnvVars.forEach(envVar => {
-        console.warn(`   - ${envVar}`);
-    });
-    console.warn('');
-    console.warn('📝 Please set these environment variables in your deployment platform');
-    console.warn('   See DEPLOYMENT.md for platform-specific instructions');
-    
-    // Set NODE_ENV to production if PORT is set (indicates cloud deployment)
-    if (process.env.PORT && !process.env.NODE_ENV) {
-        process.env.NODE_ENV = 'production';
+if (missingOptionalVars.length > 0) {
+    console.log('📝 Optional features not configured:');
+    if (missingOptionalVars.includes('EMAIL_USER') || missingOptionalVars.includes('EMAIL_PASS')) {
+        console.log('   - Email notifications (EMAIL_USER, EMAIL_PASS)');
     }
-    
-    // Don't exit in production, just warn
-    if (process.env.NODE_ENV !== 'production') {
-        console.warn('');
-        console.warn('⚠️  Continuing anyway (development mode)');
-    } else {
-        console.warn('');
-        console.warn('⚠️  Continuing in production mode - some features may be disabled');
-    }
+    console.log('');
+    console.log('✅ Core booking system will work without these');
+    console.log('📧 Email notifications will be disabled');
+}
+
+// Set NODE_ENV to production if PORT is set (indicates cloud deployment)
+if (process.env.PORT && !process.env.NODE_ENV) {
+    process.env.NODE_ENV = 'production';
 }
 
 // Set default values

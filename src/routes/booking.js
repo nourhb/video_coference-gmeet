@@ -85,7 +85,7 @@ router.post('/book', async (req, res) => {
                 meet_link: booking.meet_link,
                 status: 'confirmed'
             },
-            message: 'Booking confirmed! Check your email for the Google Meet link.'
+            message: 'Booking confirmed! Your meeting link is ready to use.'
         });
 
     } catch (error) {
