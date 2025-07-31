@@ -4,11 +4,11 @@ FROM node:18-alpine
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
-COPY package*.json ./
+# Copy package.json first for better caching
+COPY package.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm install --production
 
 # Copy the rest of the application code
 COPY . .
@@ -18,14 +18,6 @@ RUN mkdir -p data
 
 # Expose the port the app runs on
 EXPOSE 3000
-
-# Create a non-root user to run the application
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-
-# Change ownership of the app directory to the nodejs user
-RUN chown -R nextjs:nodejs /app
-USER nextjs
 
 # Define the command to run the application
 CMD ["npm", "start"]
