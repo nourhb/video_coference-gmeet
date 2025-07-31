@@ -19,7 +19,6 @@ app.use(express.static('public'));
 
 // Import modules
 const { initializeDatabase } = require('./src/database');
-const authRoutes = require('./src/routes/auth');
 const bookingRoutes = require('./src/routes/booking');
 const { sendEmailReminders } = require('./src/services/emailService');
 
@@ -27,7 +26,6 @@ const { sendEmailReminders } = require('./src/services/emailService');
 initializeDatabase();
 
 // Routes
-app.use('/auth', authRoutes);
 app.use('/api', bookingRoutes);
 
 // Serve the booking widget
@@ -43,6 +41,11 @@ app.get('/embed', (req, res) => {
 // Admin endpoint
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+// Meeting room endpoint
+app.get('/meeting/:meetingId', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'meeting.html'));
 });
 
 // Schedule email reminders (runs every minute to check for upcoming meetings)

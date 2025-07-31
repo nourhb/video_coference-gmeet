@@ -224,8 +224,8 @@
         </div>
 
         <div class="widget-form">
-            <div id="authNotice" class="auth-notice" style="display: none;">
-                <p id="authNoticeText">Authentication required. <a href="/auth/google" target="_parent">Click here</a></p>
+            <div class="info-notice" style="background: #e8f5e8; border: 1px solid #4caf50; color: #2e7d32; padding: 12px; border-radius: 6px; margin-bottom: 15px; text-align: center; font-size: 13px;">
+                <strong>✅ Ready to Book!</strong> No authentication required.
             </div>
 
             <div id="successMessage" class="message success" style="display: none;">
@@ -353,35 +353,9 @@
             const today = new Date().toISOString().split('T')[0];
             dateInput.min = today;
 
-            checkAuthStatus();
             updateTexts();
+            console.log('✅ Embed widget ready - no authentication required!');
         });
-
-        async function checkAuthStatus() {
-            try {
-                const response = await fetch('/auth/status');
-                const data = await response.json();
-                
-                if (!data.authenticated) {
-                    showAuthNotice();
-                } else {
-                    hideAuthNotice();
-                }
-            } catch (error) {
-                console.error('Error checking auth status:', error);
-                showAuthNotice();
-            }
-        }
-
-        function showAuthNotice() {
-            document.getElementById('authNotice').style.display = 'block';
-            document.getElementById('bookingForm').style.display = 'none';
-        }
-
-        function hideAuthNotice() {
-            document.getElementById('authNotice').style.display = 'none';
-            document.getElementById('bookingForm').style.display = 'block';
-        }
 
         document.getElementById('bookingForm').addEventListener('submit', async function(e) {
             e.preventDefault();

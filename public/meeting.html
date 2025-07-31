@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Room</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .meeting-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .meeting-header {
+            margin-bottom: 30px;
+        }
+
+        .meeting-header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .meeting-header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .meeting-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .meeting-id {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4285f4;
+            margin-bottom: 15px;
+        }
+
+        .meeting-link {
+            background: #4285f4;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: inline-block;
+            margin: 20px 0;
+            transition: background 0.3s ease;
+        }
+
+        .meeting-link:hover {
+            background: #3367d6;
+        }
+
+        .instructions {
+            text-align: left;
+            margin-top: 30px;
+        }
+
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .instructions li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .instructions li:before {
+            content: "✓ ";
+            color: #4285f4;
+            font-weight: bold;
+        }
+
+        .alternatives {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e8f5e8;
+            border-radius: 10px;
+        }
+
+        .alternatives h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .alternative-link {
+            display: inline-block;
+            margin: 5px 10px;
+            padding: 8px 15px;
+            background: white;
+            color: #4285f4;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            border: 1px solid #4285f4;
+        }
+
+        .alternative-link:hover {
+            background: #4285f4;
+            color: white;
+        }
+
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .meeting-container {
+                padding: 25px;
+            }
+            
+            .meeting-header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="meeting-container">
+        <div class="meeting-header">
+            <h1>🎥 Meeting Room</h1>
+            <p>Your consultation meeting space</p>
+        </div>
+
+        <div id="error-message" class="error" style="display: none;">
+            <h3>Meeting Not Found</h3>
+            <p>The meeting ID is invalid or the meeting may have expired.</p>
+        </div>
+
+        <div id="meeting-content" style="display: none;">
+            <div class="meeting-info">
+                <div class="meeting-id" id="meeting-id">Meeting ID: Loading...</div>
+                <div id="room-name">Loading meeting details...</div>
+            </div>
+
+            <a href="#" id="join-meeting" class="meeting-link" target="_blank">
+                🚀 Join Meeting Now
+            </a>
+
+            <div class="instructions">
+                <h3>📋 Before Joining:</h3>
+                <ul>
+                    <li>Test your camera and microphone</li>
+                    <li>Find a quiet, well-lit space</li>
+                    <li>Have a stable internet connection</li>
+                    <li>Close other applications to improve performance</li>
+                </ul>
+            </div>
+
+            <div class="alternatives">
+                <h3>🔄 Alternative Meeting Options:</h3>
+                <p>If the main link doesn't work, try these alternatives:</p>
+                <div id="alternative-links">
+                    <!-- Alternative links will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" style="display: block;">
+            <p>Loading meeting details...</p>
+        </div>
+    </div>
+
+    <script>
+        // Get meeting ID from URL
+        const pathParts = window.location.pathname.split('/');
+        const meetingId = pathParts[pathParts.length - 1];
+
+        async function loadMeetingDetails() {
+            try {
+                const response = await fetch(`/api/meeting/${meetingId}`);
+                const data = await response.json();
+
+                document.getElementById('loading').style.display = 'none';
+
+                if (data.success && data.meeting) {
+                    // Show meeting content
+                    document.getElementById('meeting-content').style.display = 'block';
+                    
+                    // Populate meeting details
+                    document.getElementById('meeting-id').textContent = `Meeting ID: ${data.meeting.meetingId}`;
+                    document.getElementById('room-name').textContent = data.meeting.roomName;
+                    document.getElementById('join-meeting').href = data.meeting.meetingLink;
+
+                    // Add alternative links
+                    const alternativesContainer = document.getElementById('alternative-links');
+                    
+                    // Jitsi alternatives
+                    const jitsiAlt = document.createElement('a');
+                    jitsiAlt.href = data.meeting.meetingLink;
+                    jitsiAlt.className = 'alternative-link';
+                    jitsiAlt.textContent = 'Jitsi Meet';
+                    jitsiAlt.target = '_blank';
+                    alternativesContainer.appendChild(jitsiAlt);
+
+                    // Whereby alternative
+                    const wherebyAlt = document.createElement('a');
+                    wherebyAlt.href = `https://whereby.com/consultation-${data.meeting.meetingId}`;
+                    wherebyAlt.className = 'alternative-link';
+                    wherebyAlt.textContent = 'Whereby';
+                    wherebyAlt.target = '_blank';
+                    alternativesContainer.appendChild(wherebyAlt);
+
+                    // Google Meet alternative (if user has account)
+                    const gmeetAlt = document.createElement('a');
+                    gmeetAlt.href = `https://meet.google.com/new`;
+                    gmeetAlt.className = 'alternative-link';
+                    gmeetAlt.textContent = 'Google Meet (New)';
+                    gmeetAlt.target = '_blank';
+                    alternativesContainer.appendChild(gmeetAlt);
+
+                } else {
+                    // Show error
+                    document.getElementById('error-message').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading meeting:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').style.display = 'block';
+            }
+        }
+
+        // Load meeting details when page loads
+        if (meetingId && meetingId.length === 12) {
+            loadMeetingDetails();
+        } else {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error-message').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

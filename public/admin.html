@@ -228,8 +228,9 @@
             <p>Manage and monitor consultation bookings</p>
         </div>
 
-        <div id="authNotice" class="auth-notice" style="display: none;">
-            <p>Google Calendar authentication required to manage bookings. <a href="/auth/google">Click here to authenticate</a></p>
+        <div class="info-notice" style="background: #e8f5e8; border: 1px solid #4caf50; color: #2e7d32; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+            <p><strong>✅ Simple Meeting System Active</strong><br>
+            No authentication required - direct meeting links are generated automatically!</p>
         </div>
 
         <div class="stats-grid">
@@ -288,23 +289,9 @@
     <script>
         // Load bookings on page load
         document.addEventListener('DOMContentLoaded', function() {
-            checkAuthStatus();
             loadBookings();
+            console.log('✅ Admin panel ready - simple meeting system active!');
         });
-
-        async function checkAuthStatus() {
-            try {
-                const response = await fetch('/auth/status');
-                const data = await response.json();
-                
-                if (!data.authenticated) {
-                    document.getElementById('authNotice').style.display = 'block';
-                }
-            } catch (error) {
-                console.error('Error checking auth status:', error);
-                document.getElementById('authNotice').style.display = 'block';
-            }
-        }
 
         async function loadBookings() {
             const loading = document.getElementById('loading');

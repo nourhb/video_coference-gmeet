@@ -3,9 +3,8 @@ const router = express.Router();
 const moment = require('moment');
 
 const { createBooking, getAllBookings, getBooking } = require('../database');
-const calendarService = require('../services/calendarService');
+const simpleMeetingService = require('../services/simpleMeetingService');
 const { EmailService } = require('../services/emailService');
-const googleAuth = require('../services/googleAuth');
 
 const emailService = new EmailService();
 
@@ -29,14 +28,6 @@ router.post('/book', async (req, res) => {
             });
         }
 
-        // Check if Google Calendar is authenticated
-        const isAuthenticated = await googleAuth.isAuthenticated();
-        if (!isAuthenticated) {
-            return res.status(500).json({ 
-                error: 'Google Calendar not authenticated. Please contact administrator.' 
-            });
-        }
-
         // Combine date and time into datetime
         const datetime = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm').toISOString();
         
@@ -47,16 +38,16 @@ router.post('/book', async (req, res) => {
             });
         }
 
-        // Create calendar event with Google Meet link
-        const eventData = await calendarService.createMeetingEvent({
+        // Create simple meeting room (no authentication required)
+        const meetingData = simpleMeetingService.createSimpleMeeting({
             name,
             email,
             datetime,
             duration: 60 // 60 minutes
         });
 
-        if (!eventData.meetLink) {
-            throw new Error('Failed to generate Google Meet link');
+        if (!meetingData.success) {
+            throw new Error('Failed to generate meeting link');
         }
 
         // Save booking to database
@@ -66,8 +57,8 @@ router.post('/book', async (req, res) => {
             date,
             time,
             datetime,
-            meet_link: eventData.meetLink,
-            event_id: eventData.eventId
+            meet_link: meetingData.meetingLink,
+            event_id: meetingData.meetingId
         };
 
         const booking = await createBooking(bookingData);
@@ -162,12 +153,49 @@ router.get('/available-slots', async (req, res) => {
     }
 });
 
+// Get meeting alternatives
+router.get('/meeting-services', (req, res) => {
+    try {
+        const services = simpleMeetingService.getAlternativeMeetingServices();
+        res.json({
+            success: true,
+            services: services,
+            default: 'Jitsi Meet',
+            message: 'Available video conferencing services'
+        });
+    } catch (error) {
+        console.error('Error fetching meeting services:', error);
+        res.status(500).json({ error: 'Failed to fetch meeting services' });
+    }
+});
+
+// Get meeting details by ID
+router.get('/meeting/:meetingId', (req, res) => {
+    try {
+        const { meetingId } = req.params;
+        const meeting = simpleMeetingService.getMeetingFromId(meetingId);
+        
+        if (!meeting) {
+            return res.status(404).json({ error: 'Meeting not found or invalid meeting ID' });
+        }
+
+        res.json({
+            success: true,
+            meeting: meeting
+        });
+    } catch (error) {
+        console.error('Error fetching meeting details:', error);
+        res.status(500).json({ error: 'Failed to fetch meeting details' });
+    }
+});
+
 // Health check
 router.get('/health', (req, res) => {
     res.json({ 
         status: 'OK', 
         timestamp: new Date().toISOString(),
-        service: 'Consultation Booking API'
+        service: 'Consultation Booking API (No Auth Required)',
+        features: ['Simple Meeting Rooms', 'Email Notifications', 'Booking Management']
     });
 });
 

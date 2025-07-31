@@ -233,15 +233,16 @@
         </div>
 
         <div class="form-container">
-            <div id="authNotice" class="auth-notice" style="display: none;">
-                <p id="authNoticeText">Google Calendar authentication required. <a href="/auth/google">Click here to authenticate</a></p>
+            <div class="info-notice" style="background: #e8f5e8; border: 1px solid #4caf50; color: #2e7d32; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                <p><strong>✅ No Authentication Required!</strong><br>
+                Book your consultation instantly - we'll generate a direct meeting link for you.</p>
             </div>
 
             <div id="successMessage" class="success-message">
                 <h3 id="successTitle">Booking Confirmed! ✅</h3>
-                <p id="successText">Your consultation has been booked successfully. Check your email for the Google Meet link.</p>
+                <p id="successText">Your consultation has been booked successfully. Your meeting link is ready!</p>
                 <div id="meetLinkContainer" class="meet-link" style="display: none;">
-                    <p><strong id="meetLinkLabel">Google Meet Link:</strong></p>
+                    <p><strong id="meetLinkLabel">Meeting Link:</strong></p>
                     <a id="meetLinkUrl" href="#" target="_blank">Join Meeting</a>
                 </div>
             </div>
@@ -305,34 +306,34 @@
                 headerSubtitle: "Schedule a 60-minute consultation with our expert",
                 authNoticeText: "Google Calendar authentication required. <a href='/auth/google'>Click here to authenticate</a>",
                 successTitle: "Booking Confirmed! ✅",
-                successText: "Your consultation has been booked successfully. Check your email for the Google Meet link.",
+                successText: "Your consultation has been booked successfully. Your meeting link is ready!",
                 errorTitle: "Booking Failed ❌",
                 errorText: "There was an error processing your booking. Please try again.",
-                loadingText: "Creating your booking and Google Meet link...",
+                loadingText: "Creating your booking and meeting link...",
                 nameLabel: "Full Name *",
                 emailLabel: "Email Address *",
                 dateLabel: "Date *",
                 timeLabel: "Time *",
                 selectTimeOption: "Select time",
                 submitBtnText: "Book Free Consultation",
-                meetLinkLabel: "Google Meet Link:"
+                meetLinkLabel: "Meeting Link:"
             },
             fr: {
                 headerTitle: "Réservez Votre Consultation Gratuite",
                 headerSubtitle: "Planifiez une consultation de 60 minutes avec notre expert",
                 authNoticeText: "Authentification Google Calendar requise. <a href='/auth/google'>Cliquez ici pour vous authentifier</a>",
                 successTitle: "Réservation Confirmée! ✅",
-                successText: "Votre consultation a été réservée avec succès. Vérifiez votre email pour le lien Google Meet.",
+                successText: "Votre consultation a été réservée avec succès. Votre lien de réunion est prêt!",
                 errorTitle: "Échec de la Réservation ❌",
                 errorText: "Il y a eu une erreur lors du traitement de votre réservation. Veuillez réessayer.",
-                loadingText: "Création de votre réservation et du lien Google Meet...",
+                loadingText: "Création de votre réservation et du lien de réunion...",
                 nameLabel: "Nom Complet *",
                 emailLabel: "Adresse Email *",
                 dateLabel: "Date *",
                 timeLabel: "Heure *",
                 selectTimeOption: "Sélectionner l'heure",
                 submitBtnText: "Réserver Consultation Gratuite",
-                meetLinkLabel: "Lien Google Meet:"
+                meetLinkLabel: "Lien de Réunion:"
             }
         };
 
@@ -365,43 +366,11 @@
             const today = new Date().toISOString().split('T')[0];
             dateInput.min = today;
 
-            // Check authentication status
-            checkAuthStatus();
-
-            // Check for auth success/error in URL
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('auth') === 'success') {
-                hideAuthNotice();
-            } else if (urlParams.get('auth') === 'error') {
-                showError('Authentication failed. Please try again.');
-            }
+            // No authentication required - ready to use!
+            console.log('✅ Consultation booking ready - no authentication required!');
         });
 
-        async function checkAuthStatus() {
-            try {
-                const response = await fetch('/auth/status');
-                const data = await response.json();
-                
-                if (!data.authenticated) {
-                    showAuthNotice();
-                } else {
-                    hideAuthNotice();
-                }
-            } catch (error) {
-                console.error('Error checking auth status:', error);
-                showAuthNotice();
-            }
-        }
-
-        function showAuthNotice() {
-            document.getElementById('authNotice').style.display = 'block';
-            document.getElementById('bookingForm').style.display = 'none';
-        }
-
-        function hideAuthNotice() {
-            document.getElementById('authNotice').style.display = 'none';
-            document.getElementById('bookingForm').style.display = 'block';
-        }
+        // Authentication functions removed - no longer needed!
 
         document.getElementById('bookingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
